@@ -1,0 +1,47 @@
+{
+  "name": "all-in-one-security-plugin",
+  "type": "plugin",
+  "displayName": "All-in-One Security Plugin",
+  "version": "1.1.0",
+  "entrypoint": "openclaw_security.plugin:OpenClawSecurityPlugin",
+  "autoStart": true,
+  "hooks": {
+    "onLoad": "openclaw_security.plugin:OpenClawSecurityPlugin.on_load",
+    "onEvent": "openclaw_security.plugin:OpenClawSecurityPlugin.on_event",
+    "beforeAction": "openclaw_security.plugin:OpenClawSecurityPlugin.before_action",
+    "chatCommand": "openclaw_security.plugin:OpenClawSecurityPlugin.handle_command",
+    "registerCommands": "openclaw_security.plugin:OpenClawSecurityPlugin.get_commands"
+  },
+  "monitors": [
+    "chat",
+    "web_fetch",
+    "web_search",
+    "browser_open",
+    "file_download",
+    "open_file",
+    "run_file",
+    "run_command"
+  ],
+  "commands": [
+    {
+      "id": "security.audit.show",
+      "slash": "/sec audit show [count]"
+    },
+    {
+      "id": "security.audit.clear",
+      "slash": "/sec audit clear"
+    },
+    {
+      "id": "security.vt.setApiKey",
+      "slash": "/sec set-vt-key <api_key>"
+    },
+    {
+      "id": "security.status.show",
+      "slash": "/sec status"
+    },
+    {
+      "id": "security.scan.observable",
+      "slash": "/sec check <ioc>"
+    }
+  ]
+}

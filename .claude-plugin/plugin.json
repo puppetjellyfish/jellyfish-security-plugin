@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "name": "all-in-one-security-plugin",
+  "display_name": "All-in-One Security Plugin",
+  "description": "Always-on security plugin that automatically scans prompts, behavior, files, and sites before execution or opening.",
+  "entrypoint": "openclaw_security.plugin:OpenClawSecurityPlugin",
+  "auto_start": true,
+  "intercepts": [
+    "chat",
+    "web_fetch",
+    "web_search",
+    "browser_open",
+    "file_download",
+    "open_file",
+    "run_file",
+    "run_command"
+  ],
+  "commands": [
+    {
+      "id": "security.audit.show",
+      "title": "Security: Show Audit Log"
+    },
+    {
+      "id": "security.audit.clear",
+      "title": "Security: Clear Audit Log"
+    },
+    {
+      "id": "security.vt.setApiKey",
+      "title": "Security: Set VirusTotal API Key"
+    },
+    {
+      "id": "security.status.show",
+      "title": "Security: Show Status"
+    }
+  ]
+}

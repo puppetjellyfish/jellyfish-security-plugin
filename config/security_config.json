@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "low": "log",
+    "medium": "warn",
+    "high": "warn",
+    "critical": "block"
+  },
+  "whitelist": [
+    "virustotal.com",
+    "www.virustotal.com"
+  ],
+  "blacklist": [],
+  "trusted_domains": [],
+  "upload_unknown_files": false,
+  "cache_ttl_seconds": 3600,
+  "request_timeout_seconds": 8,
+  "custom_ti_endpoints": [],
+  "hs_ti": {
+    "enabled": false,
+    "base_url": "",
+    "api_key": "",
+    "auth_header": "Authorization",
+    "observable_path": "/lookup",
+    "method": "GET",
+    "value_param": "value",
+    "type_param": "type"
+  }
+}
