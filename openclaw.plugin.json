@@ -1,0 +1,81 @@
+{
+  "id": "jellyfish-security-plugin",
+  "name": "Jellyfish Security Plugin",
+  "version": "1.2.0",
+  "kind": "security",
+  "description": "Always-on native OpenClaw plugin that automatically checks prompt risk, behavioral risk, and file/site reputation before risky actions proceed.",
+  "setupEntry": "./dist/index.js",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "virustotalApiKey": {
+        "type": "string",
+        "description": "VirusTotal API key used for automatic site and file reputation lookups."
+      },
+      "defaultAction": {
+        "type": "string",
+        "enum": ["log", "warn", "block"],
+        "default": "warn"
+      },
+      "uploadUnknownFiles": {
+        "type": "boolean",
+        "default": false,
+        "description": "Allow first-time unknown local files to be uploaded to VirusTotal."
+      },
+      "whitelist": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": []
+      },
+      "blacklist": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": []
+      }
+    }
+  },
+  "commands": [
+    {
+      "name": "security.audit.show",
+      "title": "Security: Show Audit Log",
+      "description": "Show recent plugin audit log entries."
+    },
+    {
+      "name": "security.audit.clear",
+      "title": "Security: Clear Audit Log",
+      "description": "Delete all saved audit entries."
+    },
+    {
+      "name": "security.vt.setApiKey",
+      "title": "Security: Set VirusTotal API Key",
+      "description": "Store or update the VirusTotal API key used by the plugin."
+    },
+    {
+      "name": "security.status.show",
+      "title": "Security: Show Status",
+      "description": "Display the plugin status and current VirusTotal configuration state."
+    }
+  ],
+  "hooks": [
+    { "name": "onLoad" },
+    { "name": "onEvent" },
+    { "name": "beforeAction" }
+  ],
+  "typedHooks": [
+    { "name": "chat" },
+    { "name": "web_fetch" },
+    { "name": "web_search" },
+    { "name": "browser_open" },
+    { "name": "file_download" },
+    { "name": "open_file" },
+    { "name": "run_file" },
+    { "name": "run_command" }
+  ],
+  "tools": [
+    {
+      "name": "security.check",
+      "description": "Perform a manual risk or reputation check for a URL, domain, IP, hash, or local file."
+    }
+  ]
+}

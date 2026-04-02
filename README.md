@@ -1,6 +1,6 @@
 # jellyfish-security-plugin
 
-Puppetjellyfish's always-on OpenClaw security plugin for automatic prompt-risk, behavioral-risk, and reputation-based threat checks before risky actions run.
+Puppetjellyfish's always-on **native OpenClaw code plugin** for automatic prompt-risk, behavioral-risk, and reputation-based threat checks before risky actions run.
 
 ## Features
 
@@ -14,6 +14,14 @@ Puppetjellyfish's always-on OpenClaw security plugin for automatic prompt-risk, 
 - Checks IPs, domains, URLs, and file hashes
 - Integrates with VirusTotal, Hillstone Threat Intelligence (`hs-ti`), and custom TI APIs
 - Supports block / warn / log policies, allowlists, blocklists, audit logs, metrics, and caching
+
+## Native Plugin Package Markers
+
+This repo now includes the native package files OpenClaw and ClawHub expect for a real plugin install:
+
+- `package.json`
+- `openclaw.plugin.json`
+- `dist/index.js`
 
 ## Quick Start
 
@@ -75,6 +83,10 @@ elif decision.status == "warned":
 - `/sec whitelist add|remove|list <value>`
 - `/sec blacklist add|remove|list <value>`
 - `/sec stats`
+
+## Why this now shows as a plugin
+
+The repo now ships with the standard native plugin manifests, so it should be detected under the **Plugins** family instead of only as a skill-style package.
 
 ## Manual Admin Commands
 
