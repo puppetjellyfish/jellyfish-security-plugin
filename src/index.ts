@@ -19,19 +19,24 @@ import { isMalicious, scanUrl } from "./virustotal.js";
 
 let stateDir = "";
 
-export default definePluginEntry(async (api) => {
-  stateDir = api.runtime.state.resolveStateDir();
+export default definePluginEntry({
+  id: "jellyfish-security",
+  name: "Jellyfish Security Plugin",
+  description:
+    "Defends against prompt injection, behavioral risks, and malicious files/URLs via VirusTotal",
+  async register(api) {
+    stateDir = api.runtime.state.resolveStateDir();
 
-  const config = api.pluginConfig as PluginConfig;
-  const promptGuardEnabled = config.promptGuardEnabled !== false;
-  const behaviorGuardEnabled = config.behaviorGuardEnabled !== false;
-  const vtScanEnabled = config.vtScanEnabled !== false;
+    const config = api.pluginConfig as PluginConfig;
+    const promptGuardEnabled = config.promptGuardEnabled !== false;
+    const behaviorGuardEnabled = config.behaviorGuardEnabled !== false;
+    const vtScanEnabled = config.vtScanEnabled !== false;
 
-  api.logger.info("Jellyfish Security Plugin loaded", {
-    promptGuardEnabled,
-    behaviorGuardEnabled,
-    vtScanEnabled,
-  });
+    api.logger.info("Jellyfish Security Plugin loaded", {
+      promptGuardEnabled,
+      behaviorGuardEnabled,
+      vtScanEnabled,
+    });
 
   // Hook: scan incoming messages for prompt injection
   api.registerHook("message_received", async (event) => {
@@ -215,4 +220,5 @@ export default definePluginEntry(async (api) => {
       ].join("\n");
     },
   });
+  },
 });

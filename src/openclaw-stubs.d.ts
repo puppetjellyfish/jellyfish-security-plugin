@@ -75,5 +75,13 @@ declare module "openclaw/plugin-sdk/plugin-entry" {
 
   export type PluginRegisterFn = (api: PluginApi) => void | Promise<void>;
 
+  export interface PluginEntryOptions {
+    id: string;
+    name: string;
+    description: string;
+    register: PluginRegisterFn;
+  }
+
+  export function definePluginEntry(options: PluginEntryOptions): PluginEntryOptions;
   export function definePluginEntry(fn: PluginRegisterFn): PluginRegisterFn;
 }
