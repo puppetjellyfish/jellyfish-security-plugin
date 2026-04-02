@@ -1,6 +1,6 @@
 ---
-name: all-in-one-security
-displayName: All-in-One Security Guard
+name: jellyfish-security-plugin
+displayName: Jellyfish Security Plugin
 version: 1.0.0
 description: OpenClaw security plugin for always-on prompt-risk, behavior-risk, data-risk, intent mismatch, and threat-intel preflight checks.
 entrypoint: openclaw_security.plugin:OpenClawSecurityPlugin
@@ -27,7 +27,7 @@ commands:
   - /sec stats
 ---
 
-# All-in-One Security Guard Plugin
+# Jellyfish Security Plugin
 
 This OpenClaw plugin runs as an **always-on security gate** before risky agent actions. It is designed for gateway-level enforcement and supports:
 

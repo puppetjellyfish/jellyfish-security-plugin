@@ -8,8 +8,8 @@ from .skill import OpenClawSecuritySkill
 class OpenClawSecurityPlugin(OpenClawSecuritySkill):
     """Always-on gateway plugin wrapper for the security engine."""
 
-    plugin_id = "all-in-one-security"
-    display_name = "All-in-One Security Plugin"
+    plugin_id = "jellyfish-security-plugin"
+    display_name = "Jellyfish Security Plugin"
     auto_start = True
     monitored_events = (
         "chat",

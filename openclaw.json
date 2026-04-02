@@ -1,7 +1,7 @@
 {
-  "name": "all-in-one-security-plugin",
+  "name": "jellyfish-security-plugin",
   "type": "plugin",
-  "displayName": "All-in-One Security Plugin",
+  "displayName": "Jellyfish Security Plugin",
   "version": "1.1.0",
   "entrypoint": "openclaw_security.plugin:OpenClawSecurityPlugin",
   "autoStart": true,

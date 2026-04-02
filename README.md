@@ -1,6 +1,6 @@
-# All-in-One Security OpenClaw Plugin
+# jellyfish-security-plugin
 
-A practical OpenClaw security plugin that performs **automatic pre-execution risk checks** and **threat-intel lookups** before the gateway allows risky actions.
+Puppetjellyfish's always-on OpenClaw security plugin for automatic prompt-risk, behavioral-risk, and reputation-based threat checks before risky actions run.
 
 ## Features
 
@@ -90,4 +90,5 @@ These remain available even though the plugin runs automatically:
 
 - VirusTotal free-tier rate limits still apply.
 - Uploading unknown files to VirusTotal is **disabled by default** to avoid privacy leakage; enable it in `config/security_config.json` if desired.
-- This project ships as a **drop-in skill scaffold** and may need minor adapter changes depending on your exact OpenClaw gateway runtime.
+- This project ships as a **drop-in plugin scaffold** and may need minor adapter changes depending on your exact OpenClaw gateway runtime.
+

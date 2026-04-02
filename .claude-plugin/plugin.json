@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "name": "all-in-one-security-plugin",
-  "display_name": "All-in-One Security Plugin",
+  "name": "jellyfish-security-plugin",
+  "display_name": "Jellyfish Security Plugin",
   "description": "Always-on security plugin that automatically scans prompts, behavior, files, and sites before execution or opening.",
   "entrypoint": "openclaw_security.plugin:OpenClawSecurityPlugin",
   "auto_start": true,
