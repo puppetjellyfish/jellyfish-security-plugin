@@ -1,0 +1,29 @@
+{
+  "name": "jellyfish-security-plugin",
+  "version": "1.0.0",
+  "description": "All-in-one security plugin for OpenClaw: prompt injection detection, behavioral risk analysis, and VirusTotal scanning",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "openclaw.plugin.json"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "openclaw": {
+    "extensions": ["./dist/index.js"],
+    "compat": {
+      "minGatewayVersion": "2026.0.0"
+    }
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.0.0"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.32.35",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

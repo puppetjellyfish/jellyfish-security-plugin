@@ -1,0 +1,30 @@
+{
+  "id": "jellyfish-security",
+  "name": "Jellyfish Security Plugin",
+  "description": "Defends against prompt injection, behavioral risks, and malicious files/URLs via VirusTotal",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "virustotalApiKey": {
+        "type": "string",
+        "description": "VirusTotal API key (free tier supported)"
+      },
+      "promptGuardEnabled": {
+        "type": "boolean",
+        "description": "Enable prompt injection detection",
+        "default": true
+      },
+      "behaviorGuardEnabled": {
+        "type": "boolean",
+        "description": "Enable behavioral risk detection",
+        "default": true
+      },
+      "vtScanEnabled": {
+        "type": "boolean",
+        "description": "Enable VirusTotal scanning for files and URLs",
+        "default": true
+      }
+    }
+  }
+}
