@@ -23,6 +23,11 @@
         "default": false,
         "description": "Allow first-time unknown local files to be uploaded to VirusTotal."
       },
+      "preInstallScanEnabled": {
+        "type": "boolean",
+        "default": true,
+        "description": "When enabled, skill packages are scanned before installation and risky installs are blocked."
+      },
       "whitelist": {
         "type": "array",
         "items": { "type": "string" },
@@ -55,12 +60,18 @@
       "name": "security.status.show",
       "title": "Security: Show Status",
       "description": "Display the plugin status and current VirusTotal configuration state."
+    },
+    {
+      "name": "security.preinstall.scan",
+      "title": "Security: Pre-Install Scan Status",
+      "description": "Show or change the pre-install skill scan state using /sec preinstall <status|on|off>."
     }
   ],
   "hooks": [
     { "name": "onLoad" },
     { "name": "onEvent" },
-    { "name": "beforeAction" }
+    { "name": "beforeAction" },
+    { "name": "beforeSkillInstall" }
   ],
   "typedHooks": [
     { "name": "chat" },
@@ -70,7 +81,8 @@
     { "name": "file_download" },
     { "name": "open_file" },
     { "name": "run_file" },
-    { "name": "run_command" }
+    { "name": "run_command" },
+    { "name": "skill_install" }
   ],
   "tools": [
     {

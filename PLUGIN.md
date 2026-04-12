@@ -16,5 +16,6 @@ The plugin automatically checks:
 - dangerous commands and behavioral risk
 - risky file and browser activity
 - VirusTotal reputation for URLs and local files
+- skill packages before installation (enabled by default)
 
-Manual admin commands remain available for audit logs and VirusTotal API key management.
+Manual admin commands remain available for audit logs, VirusTotal API key management, and pre-install scan control (`/sec preinstall <status|on|off>`).

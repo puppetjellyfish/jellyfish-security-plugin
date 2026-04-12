@@ -12,6 +12,7 @@
   "blacklist": [],
   "trusted_domains": [],
   "upload_unknown_files": false,
+  "preinstall_scan_enabled": true,
   "cache_ttl_seconds": 3600,
   "request_timeout_seconds": 8,
   "custom_ti_endpoints": [],

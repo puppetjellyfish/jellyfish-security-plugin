@@ -20,6 +20,7 @@ class OpenClawSecurityPlugin(OpenClawSecuritySkill):
         "open_file",
         "run_file",
         "run_command",
+        "skill_install",
     )
 
     def on_load(self) -> dict[str, Any]:
@@ -32,7 +33,19 @@ class OpenClawSecurityPlugin(OpenClawSecuritySkill):
         }
 
     def on_event(self, event: dict[str, Any]) -> Any:
-        return self.before_action(self._normalize_event(event))
+        normalized = self._normalize_event(event)
+        if normalized.get("event_type") in {"skill_install", "install_skill"}:
+            target = str(
+                normalized.get("target")
+                or normalized.get("url")
+                or normalized.get("path")
+                or ""
+            )
+            return self.before_skill_install(target, **normalized)
+        return self.before_action(normalized)
+
+    def before_skill_install(self, target: str, **context: Any) -> Any:
+        return super().before_skill_install(target, **context)
 
     def before_web_fetch(self, url: str, **context: Any) -> Any:
         return self.on_event({"event_type": "web_fetch", "url": url, **context})
@@ -84,6 +97,12 @@ class OpenClawSecurityPlugin(OpenClawSecuritySkill):
                 "description": "Display plugin status, provider configuration, and current metrics.",
                 "command": "/sec status",
             },
+            {
+                "id": "security.preinstall.scan",
+                "title": "Security: Pre-Install Scan Status",
+                "description": "Show whether automatic pre-install skill scanning is enabled.",
+                "command": "/sec preinstall status",
+            },
         ]
 
     def execute_command(self, command_id: str, *args: str) -> str:
@@ -101,6 +120,10 @@ class OpenClawSecurityPlugin(OpenClawSecuritySkill):
 
         if command_id == "security.status.show":
             return self.handle_command("/sec status")
+
+        if command_id == "security.preinstall.scan":
+            value = args[0] if args else "status"
+            return self.handle_command(f"/sec preinstall {value}")
 
         return "Unknown security command ID."
 

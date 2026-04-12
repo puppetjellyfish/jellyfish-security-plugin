@@ -50,6 +50,41 @@ class OpenClawSecuritySkill:
         self.audit.log_event(event, decision)
         return decision
 
+    def before_skill_install(self, target: str, **context: Any) -> SecurityDecision:
+        if not self.config.preinstall_scan_enabled:
+            decision = SecurityDecision(
+                status="allowed",
+                action="log",
+                summary="Pre-installation scan is disabled. Skill installation allowed.",
+            )
+            event = {
+                "event_type": "skill_install",
+                "target": target,
+                "phase": "pre_install",
+                "preinstall_scan_enabled": False,
+                **context,
+            }
+            self.audit.log_event(event, decision)
+            return decision
+
+        event = {
+            "event_type": "skill_install",
+            "target": target,
+            "phase": "pre_install",
+            **context,
+        }
+        if target.startswith(("http://", "https://")):
+            event["url"] = target
+        else:
+            event["path"] = target
+
+        decision = self.before_action(event)
+        if self._is_preinstall_risky(decision):
+            decision.status = "blocked"
+            decision.action = "block"
+            decision.summary = f"Pre-installation scan blocked skill installation: {decision.summary}"
+        return decision
+
     def handle_command(self, command: str) -> str:
         tokens = shlex.split(self._translate_command_alias(command))
         if not tokens:
@@ -74,6 +109,19 @@ class OpenClawSecuritySkill:
                 return "Usage: /sec set-vt-key <API_KEY>"
             self.config.set_vt_api_key(args[0])
             return "VirusTotal API key saved to `.env`."
+
+        if action == "preinstall":
+            subaction = args[0].lower() if args else "status"
+            if subaction in {"status", "show"}:
+                state = "on" if self.config.preinstall_scan_enabled else "off"
+                return f"Pre-installation skill scan is {state}."
+            if subaction in {"on", "enable", "enabled", "true"}:
+                self.config.set_preinstall_scan(True)
+                return "Pre-installation skill scan enabled."
+            if subaction in {"off", "disable", "disabled", "false"}:
+                self.config.set_preinstall_scan(False)
+                return "Pre-installation skill scan disabled."
+            return "Usage: /sec preinstall <status|on|off>"
 
         if action == "check":
             if not args:
@@ -170,6 +218,7 @@ class OpenClawSecuritySkill:
             "- /sec set-vt-key <API_KEY>\n"
             "- /sec check <ip|domain|url|hash>\n"
             "- /sec scan <file-or-url>\n"
+            "- /sec preinstall <status|on|off>\n"
             "- /sec preflight <event_type> <target> [--intent \"...\"] [--command \"...\"] [--payload \"...\"]\n"
             "- /sec audit show [count]\n"
             "- /sec audit clear\n"
@@ -183,10 +232,25 @@ class OpenClawSecuritySkill:
         return (
             f"VirusTotal configured: {'yes' if self.config.vt_api_key else 'no'}\n"
             f"hs-ti enabled: {'yes' if self.config.hs_ti.get('enabled') else 'no'}\n"
+            f"Pre-install scan enabled: {'yes' if self.config.preinstall_scan_enabled else 'no'}\n"
             f"Custom TI endpoints: {len(self.config.custom_ti_endpoints)}\n"
             f"Events logged: {stats.get('events', 0)}\n"
             f"Avg TI latency: {stats.get('avg_ti_latency_ms', 0.0)} ms"
         )
+
+    @staticmethod
+    def _is_preinstall_risky(decision: SecurityDecision) -> bool:
+        if decision.status == "blocked":
+            return True
+
+        risky_findings = any(finding.severity in {"high", "critical"} for finding in decision.findings)
+        risky_ti = any(
+            result.malicious
+            or result.score >= 70
+            or result.verdict.lower() in {"malicious", "suspicious"}
+            for result in decision.ti_results
+        )
+        return risky_findings or risky_ti
 
     def _handle_preflight(self, args: list[str]) -> str:
         if len(args) < 2:

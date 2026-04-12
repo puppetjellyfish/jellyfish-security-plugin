@@ -19,6 +19,7 @@ CONFIG_TEMPLATE = {
     "blacklist": [],
     "trusted_domains": [],
     "upload_unknown_files": False,
+    "preinstall_scan_enabled": True,
     "cache_ttl_seconds": 3600,
     "request_timeout_seconds": 2,
     "custom_ti_endpoints": [],
@@ -101,6 +102,18 @@ class OpenClawSecuritySkillTests(unittest.TestCase):
         after = self.skill.handle_command("/sec audit clear")
         self.assertIn("chat", before)
         self.assertIn("Cleared", after)
+
+    def test_preinstall_scan_blocks_risky_skill_by_default(self) -> None:
+        decision = self.skill.before_skill_install("https://malware.example/fake-skill.zip")
+        self.assertEqual(decision.status, "blocked")
+        self.assertEqual(decision.action, "block")
+
+    def test_preinstall_scan_can_be_disabled_by_command(self) -> None:
+        response = self.skill.handle_command("/sec preinstall off")
+        self.assertIn("disabled", response.lower())
+
+        decision = self.skill.before_skill_install("https://malware.example/fake-skill.zip")
+        self.assertEqual(decision.status, "allowed")
 
 
 if __name__ == "__main__":

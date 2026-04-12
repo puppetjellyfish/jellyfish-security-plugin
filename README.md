@@ -5,6 +5,7 @@ Puppetjellyfish's always-on **native OpenClaw code plugin** for automatic prompt
 ## Features
 
 - Auto-start plugin behavior: checks run **without user input** whenever monitored events occur
+- Pre-install skill scan: runs before skill installation and blocks risky skills by default
 - Detects prompt injection / instruction override attempts
 - Flags dangerous commands, risky file writes, and suspicious API usage
 - Detects secret leakage and PII exposure
@@ -77,6 +78,7 @@ elif decision.status == "warned":
 - `/sec set-vt-key <API_KEY>`
 - `/sec check <ip|domain|url|hash>`
 - `/sec scan <file-or-url>`
+- `/sec preinstall <status|on|off>`
 - `/sec preflight <event_type> <target> [--intent "..."]`
 - `/sec audit show [count]`
 - `/sec audit clear`
@@ -96,6 +98,7 @@ These remain available even though the plugin runs automatically:
 - `security.audit.clear`
 - `security.vt.setApiKey`
 - `security.status.show`
+- `security.preinstall.scan`
 - Slash-command equivalents under `/sec ...`
 
 ## Caveats

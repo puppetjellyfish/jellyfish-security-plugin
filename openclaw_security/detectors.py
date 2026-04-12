@@ -206,7 +206,7 @@ class RiskDetector:
                 )
             )
 
-        if event_type in {"browser_open", "web_fetch", "file_download"} and url:
+        if event_type in {"browser_open", "web_fetch", "file_download", "skill_install", "install_skill"} and url:
             parsed = urlparse(url)
             suspicious_suffixes = (".exe", ".msi", ".bat", ".ps1", ".scr", ".zip", ".iso")
             if parsed.path.lower().endswith(suspicious_suffixes):

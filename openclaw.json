@@ -10,6 +10,7 @@
     "onLoad": "openclaw_security.plugin:OpenClawSecurityPlugin.on_load",
     "onEvent": "openclaw_security.plugin:OpenClawSecurityPlugin.on_event",
     "beforeAction": "openclaw_security.plugin:OpenClawSecurityPlugin.before_action",
+    "beforeSkillInstall": "openclaw_security.plugin:OpenClawSecurityPlugin.before_skill_install",
     "chatCommand": "openclaw_security.plugin:OpenClawSecurityPlugin.handle_command",
     "registerCommands": "openclaw_security.plugin:OpenClawSecurityPlugin.get_commands"
   },
@@ -21,7 +22,8 @@
     "file_download",
     "open_file",
     "run_file",
-    "run_command"
+    "run_command",
+    "skill_install"
   ],
   "commands": [
     {
@@ -39,6 +41,10 @@
     {
       "id": "security.status.show",
       "slash": "/sec status"
+    },
+    {
+      "id": "security.preinstall.scan",
+      "slash": "/sec preinstall <status|on|off>"
     },
     {
       "id": "security.scan.observable",
