@@ -82,7 +82,8 @@
       "security.audit.clear",
       "security.vt.setApiKey",
       "security.status.show",
-      "security.preinstall.scan"
+      "security.preinstall.scan",
+      "security.advanced.injection"
     ]
   }
 }

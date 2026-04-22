@@ -29,6 +29,133 @@ PROMPT_RULES = [
     ),
 ]
 
+# Advanced patterns – only applied when advanced_injection_enabled is True.
+ADVANCED_PROMPT_RULES = [
+    (
+        "Role-hijacking injection",
+        re.compile(
+            r"(pretend\s+(you\s+are|to\s+be)|act\s+as(\s+if)?|roleplay\s+as|play\s+the\s+role\s+of"
+            r"|you\s+are\s+now|imagine\s+you\s+are|respond\s+as\s+if\s+you\s+are)",
+            re.IGNORECASE,
+        ),
+        "high",
+        "The prompt attempts to hijack the AI's role or persona.",
+    ),
+    (
+        "Jailbreak / unrestricted mode attempt",
+        re.compile(
+            r"(jailbreak|DAN\s+mode|developer\s+mode|god\s+mode|unrestricted\s+mode"
+            r"|no[\s-]restrictions?|without\s+(filters?|restrictions?|censorship)"
+            r"|evil\s+mode|unfiltered\s+mode)",
+            re.IGNORECASE,
+        ),
+        "critical",
+        "The prompt uses a known jailbreak or mode-switch technique.",
+    ),
+    (
+        "Instruction delimiter injection",
+        re.compile(
+            r"(\[INST\]|\[/INST\]|<\|im_start\|>|<\|im_end\|>|<\|system\|>"
+            r"|<\|user\|>|<\|assistant\|>|<system>|</system>"
+            r"|#{3,}.*instruct|<s>.*\[INST\])",
+            re.IGNORECASE,
+        ),
+        "critical",
+        "The prompt injects special LLM control tokens or delimiters to manipulate model context.",
+    ),
+    (
+        "Instruction override / context reset",
+        re.compile(
+            r"(from\s+now\s+on|starting\s+(now|immediately)|for\s+(this|the\s+rest\s+of\s+(this|the))\s+(session|conversation|chat)"
+            r"|new\s+instructions?\s*(follow|are|:)|your\s+new\s+(task|goal|purpose|instructions?)"
+            r"|disregard\s+(everything|all|any)\s+(above|before|prior|previous))",
+            re.IGNORECASE,
+        ),
+        "high",
+        "The prompt attempts to reset or override previously established instructions.",
+    ),
+    (
+        "Persona manipulation / filter removal",
+        re.compile(
+            r"(your\s+(true|real|inner|authentic)\s+self|without\s+your\s+(filters?|restrictions?|training)"
+            r"|trained\s+to\s+(ignore|bypass|disregard)|true\s+nature\s+is|unshackled|unchained)",
+            re.IGNORECASE,
+        ),
+        "high",
+        "The prompt tries to convince the AI to act against its trained values.",
+    ),
+    (
+        "Indirect instruction injection",
+        re.compile(
+            r"(the\s+following\s+(text|content|data|input|message)\s+(contains?|includes?|has)\s+instructions?"
+            r"|please\s+follow\s+the\s+instructions?\s+below"
+            r"|treat\s+(the\s+following|this)\s+as\s+(instructions?|commands?|directives?)"
+            r"|execute\s+the\s+following\s+instructions?)",
+            re.IGNORECASE,
+        ),
+        "high",
+        "The prompt attempts to inject instructions indirectly through data or framing.",
+    ),
+    (
+        "Covert system prompt extraction",
+        re.compile(
+            r"(output\s+(your\s+)?(full|complete|entire|original)\s+(system\s+prompt|instructions?|prompt)"
+            r"|what\s+(are|were)\s+your\s+(instructions?|system\s+prompt|initial\s+prompt)"
+            r"|repeat\s+(everything|all)\s+(above|before|verbatim))",
+            re.IGNORECASE,
+        ),
+        "high",
+        "The prompt attempts to extract the full system prompt or initial instructions.",
+    ),
+    (
+        "Encoding / obfuscation injection",
+        re.compile(
+            r"(base64[\s_-]?(decode|encoded)|rot13|hex[\s_-]?decode"
+            r"|decode\s+(this|the\s+following)\s*(and\s+)?(execute|run|follow|apply)"
+            r"|eval\(atob\(|eval\(unescape\()",
+            re.IGNORECASE,
+        ),
+        "critical",
+        "The prompt uses encoding or obfuscation to conceal injection instructions.",
+    ),
+]
+
+# Patterns that are specifically suspicious when found inside externally fetched content
+# (web pages, API responses, file downloads), indicating indirect / second-order injection.
+WEB_CONTENT_INJECTION_RULES = [
+    (
+        "Web content prompt injection",
+        re.compile(
+            r"(ignore\s+(all|any|previous|prior)\s+(instructions?|rules?|guardrails?)"
+            r"|IGNORE PREVIOUS|forget\s+(all\s+)?(previous|prior)\s+instructions?)",
+            re.IGNORECASE,
+        ),
+        "critical",
+        "Externally fetched content contains prompt injection directives.",
+    ),
+    (
+        "Web content instruction hijack",
+        re.compile(
+            r"(from\s+now\s+on|your\s+new\s+(task|goal|instructions?)"
+            r"|disregard\s+(everything|all)\s+(above|before|prior)"
+            r"|\[INST\]|\[/INST\]|<\|im_start\|>|<\|im_end\|>|<\|system\|>)",
+            re.IGNORECASE,
+        ),
+        "critical",
+        "Externally fetched content contains instruction-override or delimiter injection.",
+    ),
+    (
+        "Web content role-hijacking",
+        re.compile(
+            r"(pretend\s+(you\s+are|to\s+be)|act\s+as(\s+if)?|you\s+are\s+now"
+            r"|jailbreak|DAN\s+mode|developer\s+mode|unrestricted\s+mode)",
+            re.IGNORECASE,
+        ),
+        "high",
+        "Externally fetched content attempts to hijack the AI's role or trigger a jailbreak.",
+    ),
+]
+
 DANGEROUS_COMMAND_RULES = [
     (
         "Destructive command",
@@ -135,19 +262,31 @@ class RiskDetector:
         if payload:
             findings.extend(self.analyze_data(payload, url=str(event.get("url") or event.get("api_call") or "")))
 
+        # Scan externally fetched content for indirect (second-order) injection.
+        event_type = str(event.get("event_type", "")).lower()
+        if event_type in {"web_fetch", "browser_open", "web_search", "file_download"}:
+            web_body = str(event.get("response_body") or event.get("content") or event.get("body") or "").strip()
+            if web_body:
+                findings.extend(self.analyze_web_content(web_body))
+
         intent = str(event.get("intent", "")).strip()
         if intent:
             findings.extend(self.analyze_intent_mismatch(intent, event))
 
         return findings
 
-    def analyze_prompt(self, text: str) -> list[RiskFinding]:
+    def _apply_rules(
+        self,
+        text: str,
+        rules: list[tuple[str, re.Pattern[str], str, str]],
+        category: str,
+    ) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
-        for title, pattern, severity, detail in PROMPT_RULES:
+        for title, pattern, severity, detail in rules:
             if pattern.search(text):
                 findings.append(
                     RiskFinding(
-                        category="prompt",
+                        category=category,
                         severity=severity,
                         title=title,
                         detail=detail,
@@ -156,6 +295,18 @@ class RiskDetector:
                     )
                 )
         return findings
+
+    def analyze_prompt(self, text: str) -> list[RiskFinding]:
+        findings = self._apply_rules(text, PROMPT_RULES, "prompt")
+        if self.config.advanced_injection_enabled:
+            findings.extend(self._apply_rules(text, ADVANCED_PROMPT_RULES, "prompt_advanced"))
+        return findings
+
+    def analyze_web_content(self, text: str) -> list[RiskFinding]:
+        """Scan externally fetched content for indirect prompt injection attempts."""
+        if not self.config.advanced_injection_enabled:
+            return []
+        return self._apply_rules(text, WEB_CONTENT_INJECTION_RULES, "web_injection")
 
     def analyze_behavior(self, event: dict[str, Any]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
