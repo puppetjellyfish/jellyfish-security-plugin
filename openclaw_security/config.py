@@ -18,6 +18,7 @@ DEFAULT_CONFIG = {
     "trusted_domains": [],
     "upload_unknown_files": False,
     "preinstall_scan_enabled": True,
+    "advanced_injection_enabled": True,
     "cache_ttl_seconds": 3600,
     "request_timeout_seconds": 8,
     "custom_ti_endpoints": [],
@@ -64,6 +65,7 @@ class SecurityConfig:
     trusted_domains: list[str] = field(default_factory=list)
     upload_unknown_files: bool = False
     preinstall_scan_enabled: bool = True
+    advanced_injection_enabled: bool = True
     cache_ttl_seconds: int = 3600
     request_timeout_seconds: int = 8
     custom_ti_endpoints: list[dict[str, Any]] = field(default_factory=list)
@@ -99,6 +101,7 @@ class SecurityConfig:
             trusted_domains=loaded.get("trusted_domains", []),
             upload_unknown_files=bool(loaded.get("upload_unknown_files", False)),
             preinstall_scan_enabled=bool(loaded.get("preinstall_scan_enabled", True)),
+            advanced_injection_enabled=bool(loaded.get("advanced_injection_enabled", True)),
             cache_ttl_seconds=int(loaded.get("cache_ttl_seconds", 3600)),
             request_timeout_seconds=int(loaded.get("request_timeout_seconds", 8)),
             custom_ti_endpoints=loaded.get("custom_ti_endpoints", []),
@@ -114,6 +117,7 @@ class SecurityConfig:
             "trusted_domains": self.trusted_domains,
             "upload_unknown_files": self.upload_unknown_files,
             "preinstall_scan_enabled": self.preinstall_scan_enabled,
+            "advanced_injection_enabled": self.advanced_injection_enabled,
             "cache_ttl_seconds": self.cache_ttl_seconds,
             "request_timeout_seconds": self.request_timeout_seconds,
             "custom_ti_endpoints": self.custom_ti_endpoints,
@@ -134,6 +138,10 @@ class SecurityConfig:
 
     def set_preinstall_scan(self, enabled: bool) -> None:
         self.preinstall_scan_enabled = enabled
+        self.save()
+
+    def set_advanced_injection(self, enabled: bool) -> None:
+        self.advanced_injection_enabled = enabled
         self.save()
 
     def update_list(self, list_name: str, value: str, add: bool = True) -> list[str]:

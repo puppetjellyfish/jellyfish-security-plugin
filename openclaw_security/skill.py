@@ -123,6 +123,19 @@ class OpenClawSecuritySkill:
                 return "Pre-installation skill scan disabled."
             return "Usage: /sec preinstall <status|on|off>"
 
+        if action in {"advanced-injection", "advanced_injection", "adv-injection"}:
+            subaction = args[0].lower() if args else "status"
+            if subaction in {"status", "show"}:
+                state = "on" if self.config.advanced_injection_enabled else "off"
+                return f"Advanced prompt injection defence is {state}."
+            if subaction in {"on", "enable", "enabled", "true"}:
+                self.config.set_advanced_injection(True)
+                return "Advanced prompt injection defence enabled."
+            if subaction in {"off", "disable", "disabled", "false"}:
+                self.config.set_advanced_injection(False)
+                return "Advanced prompt injection defence disabled. Basic defence remains active."
+            return "Usage: /sec advanced-injection <status|on|off>"
+
         if action == "check":
             if not args:
                 return "Usage: /sec check <ip|domain|url|hash>"
@@ -219,6 +232,7 @@ class OpenClawSecuritySkill:
             "- /sec check <ip|domain|url|hash>\n"
             "- /sec scan <file-or-url>\n"
             "- /sec preinstall <status|on|off>\n"
+            "- /sec advanced-injection <status|on|off>  (detect role-hijacks, jailbreaks, delimiter attacks, and web content injection)\n"
             "- /sec preflight <event_type> <target> [--intent \"...\"] [--command \"...\"] [--payload \"...\"]\n"
             "- /sec audit show [count]\n"
             "- /sec audit clear\n"
@@ -233,6 +247,7 @@ class OpenClawSecuritySkill:
             f"VirusTotal configured: {'yes' if self.config.vt_api_key else 'no'}\n"
             f"hs-ti enabled: {'yes' if self.config.hs_ti.get('enabled') else 'no'}\n"
             f"Pre-install scan enabled: {'yes' if self.config.preinstall_scan_enabled else 'no'}\n"
+            f"Advanced injection defence: {'on' if self.config.advanced_injection_enabled else 'off'}\n"
             f"Custom TI endpoints: {len(self.config.custom_ti_endpoints)}\n"
             f"Events logged: {stats.get('events', 0)}\n"
             f"Avg TI latency: {stats.get('avg_ti_latency_ms', 0.0)} ms"

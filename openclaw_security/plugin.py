@@ -103,6 +103,12 @@ class OpenClawSecurityPlugin(OpenClawSecuritySkill):
                 "description": "Show whether automatic pre-install skill scanning is enabled.",
                 "command": "/sec preinstall status",
             },
+            {
+                "id": "security.advanced.injection",
+                "title": "Security: Advanced Injection Defence",
+                "description": "Enable, disable, or check the status of advanced prompt injection defence (on by default).",
+                "command": "/sec advanced-injection status",
+            },
         ]
 
     def execute_command(self, command_id: str, *args: str) -> str:
@@ -124,6 +130,10 @@ class OpenClawSecurityPlugin(OpenClawSecuritySkill):
         if command_id == "security.preinstall.scan":
             value = args[0] if args else "status"
             return self.handle_command(f"/sec preinstall {value}")
+
+        if command_id == "security.advanced.injection":
+            value = args[0] if args else "status"
+            return self.handle_command(f"/sec advanced-injection {value}")
 
         return "Unknown security command ID."
 
